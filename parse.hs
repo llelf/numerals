@@ -9,6 +9,7 @@ import Text.XML.HXT.Core
 import Text.XML.HXT.XPath
 import Text.Read
 import Data.Char
+import Control.Monad
 import Data.String.Interpolate
 
 import Data.Text.Numerals.Types
@@ -83,7 +84,8 @@ parseLang lang = do
   [Rule la cc] <- runX $ readDocumentOf lang >>> purr
   return $ M.fromList cc
 
-main = do
-  parseLang "en" >>= writeLang "en"
-  parseLang "fi" >>= writeLang "fi"
+langs = ["en","fi","hi","hy","id","ja","ms","se"]
+
+main = forM_ langs $ \lang -> parseLang lang >>= writeLang lang
+
 
