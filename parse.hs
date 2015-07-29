@@ -9,22 +9,9 @@ import Text.XML.HXT.Core
 import Text.XML.HXT.XPath
 import Text.Read
 
+import Data.Text.Numerals.Types
 
 
-
-data Fun = Prefix               -- | base digit
-         | Postfix              -- | minor digits
-           deriving (Eq,Ord,Show)
-
-data Part = S String            -- | literal string
-          | Possible [Part]     -- | […]
-          | Fun Fun             -- | ←…← / →…→ / …
-          | Stop                -- | too big, leave it in numeric form
-            deriving (Eq,Ord,Show)
-
-data Gender = Masculine | Feminine | Neuter deriving Show
-
-data Rule = Rule String [(Int, [Part])]
 
 parser :: Parser [Part]
 parser = [Stop] <$ string "=#"
