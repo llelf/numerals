@@ -74,9 +74,7 @@ readBase = proc x ->
 
 
 
-
-
-en = readDocument [] "data/num/en.xml"
+en = readDocument [] "definitions/num/en.xml"
 
 
 spell q = do
