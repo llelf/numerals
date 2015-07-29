@@ -1,0 +1,5 @@
+
+module Data.Text.Defs.Fi where
+import Data.Map
+import Data.Text.Numerals.Types
+rule = fromList [(0,[S "nolla"]),(1,[S "yksi"]),(2,[S "kaksi"]),(3,[S "kolme"]),(4,[S "nelj\228"]),(5,[S "viisi"]),(6,[S "kuusi"]),(7,[S "seitsem\228n"]),(8,[S "kahdeksan"]),(9,[S "yhdeks\228n"]),(10,[S "kymmenen"]),(11,[Fun Postfix,S "toista"]),(20,[Fun Prefix,S "kymment\228",Possible [S "\173",Fun Postfix]]),(100,[S "sata",Possible [S "\173",Fun Postfix]]),(200,[Fun Prefix,S "\173sataa",Possible [S "\173",Fun Postfix]]),(1000,[S "tuhat",Possible [S "\173",Fun Postfix]]),(2000,[Fun Prefix,S "\173tuhatta",Possible [S "\173",Fun Postfix]]),(1000000,[Fun Prefix,S " miljoona",Possible [S " ",Fun Postfix]]),(2000000,[Fun Prefix,S " miljoonaa",Possible [S " ",Fun Postfix]]),(1000000000,[Fun Prefix,S " miljardi",Possible [S " ",Fun Postfix]]),(2000000000,[Fun Prefix,S " miljardia",Possible [S " ",Fun Postfix]]),(1000000000000,[Fun Prefix,S " biljoona",Possible [S " ",Fun Postfix]]),(2000000000000,[Fun Prefix,S " biljoonaa",Possible [S " ",Fun Postfix]]),(1000000000000000000,[Stop])]
