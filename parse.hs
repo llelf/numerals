@@ -1,4 +1,4 @@
-{-# LANGUAGE Arrows #-}
+{-# LANGUAGE Arrows, QuasiQuotes #-}
 module Main where
 
 import qualified Data.Map as M
@@ -8,6 +8,7 @@ import Control.Applicative ((<$),(<$>))
 import Text.XML.HXT.Core
 import Text.XML.HXT.XPath
 import Text.Read
+import Data.String.Interpolate
 
 import Data.Text.Numerals.Types
 
@@ -64,12 +65,15 @@ readBase = proc x ->
 en = readDocument [] "definitions/num/en.xml"
 
 
-spell q = do
+
+main = do
   [Rule la cc] <- runX $ en >>> purr
   let rules = M.fromList cc :: M.Map Int [Part]
-
-  print $ process rules (Just q)
-
-
-
+  writeFile "Data/Text/Defs/En.hs"
+            [i|
+module Data.Text.Defs.En where
+import Data.Map
+import Data.Text.Numerals.Types
+rule = #{rules}
+|]
 
