@@ -41,8 +41,8 @@ process rls (Just x)
                 f (S s) = s
                 f (Possible smth) | diff>0 = process1 0 diff smth
                                   | otherwise = ""
-                f (Fun Prefix) = process rls (Just k)
-                f (Fun Postfix) = process rls (Just diff)
+                f (Fun Prefix Default) = process rls (Just k)
+                f (Fun Postfix Default) = process rls (Just diff)
                 f Stop = show x
 
 

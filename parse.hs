@@ -4,7 +4,7 @@ module Main where
 import qualified Data.Map as M
 import Text.Parsec
 import Text.Parsec.String
-import Control.Applicative ((<$),(<$>))
+import Control.Applicative ((<$),(<$>),(*>))
 import Text.XML.HXT.Core
 import Text.XML.HXT.XPath
 import Text.Read
@@ -19,16 +19,26 @@ import Data.Text.Numerals.Types
 -- and
 -- http://www.icu-project.org/apiref/icu4c/classicu_1_1RuleBasedNumberFormat.html
 
--- “un miliardo[ →→];” ⟶ [S "un miliardo", Possible [S " ", Fun Postfix]]
+-- “un miliardo[ →→];”   ⟶ [S "un miliardo", Possible [S " ", Fun Postfix Default]]
+-- “vent→%%msc-with-i→;” ⟶ [S "vent", Fun Postfix (Alt "msc-with-i")]
 parser :: Parser [Part]
-parser = [Stop] <$ string "=#"
+parser = [Stop] <$ try (string "=#")
          <|> normal
     where normal = many (between (string "[") (string "]") (Possible <$> normal)
-                         <|> Fun Prefix <$ string "←←"
-                         <|> Fun Postfix <$ string "→→"
+                         <|> Replace <$>     between (char '=') (char '=') ruleRef
+                         <|> Fun Prefix <$>  between (char '←') (char '←') ruleRef
+                         <|> Fun Postfix <$> between (char '→') (char '→') ruleRef
                          <|> S <$> many1 (letter<|>space<|>punct))
 
-punct = char '-' <|> char '\173'
+punct = oneOf "-\xad"
+
+ruleRef :: Parser RuleRef
+ruleRef = Alt <$> altRuleName <|> Default <$ string ""
+
+altRuleName :: Parser String
+altRuleName = char '%' *> (char '%' *> name
+                           <|> name)
+    where name = many1 (alphaNum <|> char '-')
 
 
 parseRule :: String -> [Part]
