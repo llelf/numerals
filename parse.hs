@@ -8,12 +8,17 @@ import Control.Applicative ((<$),(<$>))
 import Text.XML.HXT.Core
 import Text.XML.HXT.XPath
 import Text.Read
+import Data.Char
 import Data.String.Interpolate
 
 import Data.Text.Numerals.Types
 
 
+-- Unicode TR35
+-- and
+-- http://www.icu-project.org/apiref/icu4c/classicu_1_1RuleBasedNumberFormat.html
 
+-- “un miliardo[ →→];” ⟶ [S "un miliardo", Possible [S " ", Fun Postfix]]
 parser :: Parser [Part]
 parser = [Stop] <$ string "=#"
          <|> normal
@@ -22,7 +27,7 @@ parser = [Stop] <$ string "=#"
                          <|> Fun Postfix <$ string "→→"
                          <|> S <$> many1 (letter<|>space<|>punct))
 
-punct = char '-'
+punct = char '-' <|> char '\173'
 
 
 parseRule :: String -> [Part]
@@ -61,19 +66,24 @@ readBase = proc x ->
 
 
 
-
-en = readDocument [] "definitions/num/en.xml"
-
+readDocumentOf lang = readDocument [] [i|definitions/num/#{lang}.xml|]
 
 
-main = do
-  [Rule la cc] <- runX $ en >>> purr
-  let rules = M.fromList cc :: M.Map Int [Part]
-  writeFile "Data/Text/Defs/En.hs"
+writeLang lang rules = writeFile [i|Data/Text/Defs/#{mlang}.hs|]
             [i|
-module Data.Text.Defs.En where
+module Data.Text.Defs.#{mlang} where
 import Data.Map
 import Data.Text.Numerals.Types
 rule = #{rules}
-|]
+|] where mlang = toUpper (head lang) : tail lang
+
+
+parseLang :: String -> IO BasesMap
+parseLang lang = do
+  [Rule la cc] <- runX $ readDocumentOf lang >>> purr
+  return $ M.fromList cc
+
+main = do
+  parseLang "en" >>= writeLang "en"
+  parseLang "fi" >>= writeLang "fi"
 
