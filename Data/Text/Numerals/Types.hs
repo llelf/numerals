@@ -1,5 +1,5 @@
 module Data.Text.Numerals.Types where
-
+import Data.Map (Map)
 
 data Fun = Prefix               -- | base digit
          | Postfix              -- | minor digits
@@ -13,4 +13,6 @@ data Part = S String            -- | literal string
 
 data Gender = Masculine | Feminine | Neuter deriving Show
 
-data Rule = Rule String [(Int, [Part])]
+type BasesMap = Map Integer [Part]
+
+data Rule = Rule String [(Integer, [Part])]

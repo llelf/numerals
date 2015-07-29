@@ -47,12 +47,12 @@ purr = proc z ->
           returnA -< Rule lang r
 
 
-toRuleset :: IOSArrow XmlTree (Int, [Part])
+toRuleset :: IOSArrow XmlTree (Integer, [Part])
 toRuleset = proc r -> do v <- getAttrValue "value" >>> readBase -< r
                          t <- this /> getText -< r
                          returnA -< (v, parseRule t)
 
-readBase :: (ArrowXml cat, ArrowChoice cat) => cat String Int
+readBase :: (ArrowXml cat, ArrowChoice cat) => cat String Integer
 readBase = proc x ->
            case readMaybe x of
              Just v -> returnA -< v
