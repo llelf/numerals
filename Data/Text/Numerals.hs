@@ -20,8 +20,8 @@ import qualified Data.Text.Defs.Fi as Fi
 spellEn = spell En.rule
 spellFi = spell Fi.rule
 
-spell r = process r . Just
-
+spell (Rule la ru) = process r . Just
+    where r = ru M.! "spellout-cardinal"
 
 
 process :: BasesMap -> Maybe Integer -> String

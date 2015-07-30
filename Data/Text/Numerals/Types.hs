@@ -19,4 +19,4 @@ data Gender = Masculine | Feminine | Neuter deriving Show
 
 type BasesMap = Map Integer [Part]
 
-data Rule = Rule String [(Integer, [Part])]
+data Rule = Rule String (Map String BasesMap) deriving Show

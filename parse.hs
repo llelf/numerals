@@ -9,6 +9,7 @@ import Text.XML.HXT.Core
 import Text.XML.HXT.XPath
 import Text.Read
 import Data.Char
+import Data.List
 import Control.Monad
 import Data.String.Interpolate
 
@@ -57,16 +58,23 @@ purr :: IOSArrow XmlTree Rule
 purr = proc z ->
        do ld <- this /> hasName "ldml" -< z
           lang <- this /> getXPathTrees "identity/language" >>> getAttrValue "type" -< ld
-          ruleset <- this /> getXPathTrees "rbnf/rulesetGrouping/ruleset"
-                     >>> hasAttrValue "type" (=="spellout-cardinal") -< ld
-          r <- listA $ this /> hasName "rbnfrule" >>> toRuleset -< ruleset
-          returnA -< Rule lang r
+          ruleset <- listA (this /> getXPathTrees "rbnf/rulesetGrouping/ruleset"
+                                -- TODO parse rules there
+                            >>> hasAttrValue "type" (not . ("ordinal" `isSuffixOf`))
+                            >>> toRuleset) -< ld
+          returnA -< Rule lang (M.fromList ruleset)
 
 
-toRuleset :: IOSArrow XmlTree (Integer, [Part])
-toRuleset = proc r -> do v <- getAttrValue "value" >>> readBase -< r
-                         t <- this /> getText -< r
-                         returnA -< (v, parseRule t)
+
+toRuleset :: IOSArrow XmlTree (String,BasesMap)
+toRuleset = proc rs -> do typ <- getAttrValue "type" -< rs
+                          bases <- listA $ this /> hasName "rbnfrule" >>> toRule -< rs
+                          returnA -< (typ, M.fromList bases)
+
+toRule :: IOSArrow XmlTree (Integer, [Part])
+toRule = proc r -> do v <- getAttrValue "value" >>> readBase -< r
+                      t <- this /> getText -< r
+                      returnA -< (v, parseRule t)
 
 readBase :: (ArrowXml cat, ArrowChoice cat) => cat String Integer
 readBase = proc x ->
@@ -85,16 +93,17 @@ writeLang lang rules = writeFile [i|Data/Text/Defs/#{mlang}.hs|]
 module Data.Text.Defs.#{mlang} where
 import Data.Map
 import Data.Text.Numerals.Types
+rule :: Rule
 rule = #{rules}
 |] where mlang = toUpper (head lang) : tail lang
 
 
-parseLang :: String -> IO BasesMap
+parseLang :: String -> IO Rule
 parseLang lang = do
-  [Rule la cc] <- runX $ readDocumentOf lang >>> purr
-  return $ M.fromList cc
+  [rules] <- runX $ readDocumentOf lang >>> purr
+  return rules
 
-langs = ["en","fi","hi","hy","id","ja","ms","se"]
+langs = ["en","fi","hi","hy","id","ms","se"]
 
 main = forM_ langs $ \lang -> parseLang lang >>= writeLang lang
 
