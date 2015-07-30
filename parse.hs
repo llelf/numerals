@@ -44,13 +44,6 @@ altRuleName = char '%' *> (char '%' *> name
     where name = T.pack <$> many1 (alphaNum <|> char '-')
 
 
-spellouts :: [(String, Maybe Gender)]
-spellouts = [("spellout-cardinal-masculine", Just Masculine),
-             ("spellout-cardinal-feminine",  Just Feminine),
-             ("spellout-cardinal-neuter",    Just Neuter),
-             ("spellout-cardinal",           Nothing)]
-
-
 parseSpellout :: T.Text -> Spellout
 parseSpellout s = either (error $ "parseRule ‘"++show s++"’") id . parse parser "" $ s
 

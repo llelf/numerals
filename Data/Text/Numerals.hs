@@ -27,6 +27,16 @@ spell (Rule la ru) = process r . Just
     where r = ru M.! "spellout-cardinal"
 
 
+spelloutsByGender :: [(Maybe Gender, RuleSetName)]
+spelloutsByGender = [
+ (Just Masculine, "spellout-cardinal-masculine"),
+ (Just Feminine,  "spellout-cardinal-feminine"),
+ (Just Neuter,    "spellout-cardinal-neuter"),
+ (Nothing,        "spellout-cardinal")]
+
+
+
+
 process :: BasesMap -> Maybe Integer -> Text
 process rls Nothing = ""
 process rls (Just x)
