@@ -88,9 +88,9 @@ readBase = proc x ->
 readDocumentOf lang = readDocument [] [i|definitions/num/#{lang}.xml|]
 
 
-writeLang lang rules = writeFile [i|Data/Text/Defs/#{mlang}.hs|]
+writeLang lang rules = writeFile [i|Data/Text/Numerals/Defs/#{mlang}.hs|]
             [i|
-module Data.Text.Defs.#{mlang} where
+module Data.Text.Numerals.Defs.#{mlang} where
 import Data.Map
 import Data.Text.Numerals.Types
 rule :: Rule

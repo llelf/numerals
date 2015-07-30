@@ -12,8 +12,8 @@ module Data.Text.Numerals where
 
 import qualified Data.Map as M
 import Data.Text.Numerals.Types
-import qualified Data.Text.Defs.En as En
-import qualified Data.Text.Defs.Fi as Fi
+import qualified Data.Text.Numerals.Defs.En as En
+import qualified Data.Text.Numerals.Defs.Fi as Fi
 
 
 
