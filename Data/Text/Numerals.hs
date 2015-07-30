@@ -45,18 +45,22 @@ process rls (Just x)
     where
           process1 ruleBase x prc = T.concat . map f $ prc
               where
-                -- Rule = { n*base   =>  "spelling" }
-                -- We have x: x = n*base + diff
-                -- TODO this will be wrong for other languages
+                -- Rule = { (ruleBase = n*base)  ⟹  "spelling" }
+                -- We have x: x = k*base + diff
                 diff = x - k*base
-                k | base>0    = x `div` base
-                  | otherwise = 1
+                k = x `div` base
+                base | ruleBase>0 = baseBase 10 ruleBase
+                     | otherwise  = 1
                 f (S s) = s
-                f (Possible smth) | diff>0 = process1 0 diff smth
+                f (Possible smth) | diff>0 = T.concat . map f $ smth
                                   | otherwise = ""
                 f (Fun Prefix Default) = process rls (Just k)
                 f (Fun Postfix Default) = process rls (Just diff)
                 f Stop = T.pack (show x)
 
+
+-- 12345₁₀ ⟶ 10000
+baseBase :: Integer -> Integer -> Integer
+baseBase b x = b ^ floor (logBase (fromInteger b) (fromInteger x + 0.5))
 
 
