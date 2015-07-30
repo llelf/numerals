@@ -22,7 +22,7 @@ import Data.Text.Numerals.Types
 
 -- “un miliardo[ →→];”   ⟶ [S "un miliardo", Possible [S " ", Fun Postfix Default]]
 -- “vent→%%msc-with-i→;” ⟶ [S "vent", Fun Postfix (Alt "msc-with-i")]
-parser :: Parser [Part]
+parser :: Parser Spellout
 parser = [Stop] <$ try (string "=#")
          <|> normal
     where normal = many (between (string "[") (string "]") (Possible <$> normal)
@@ -42,8 +42,8 @@ altRuleName = char '%' *> (char '%' *> name
     where name = many1 (alphaNum <|> char '-')
 
 
-parseRule :: String -> [Part]
-parseRule s = either (error $ "parseRule ‘"++s++"’") id . parse parser "" $ s
+parseSpellout :: String -> Spellout
+parseSpellout s = either (error $ "parseRule ‘"++s++"’") id . parse parser "" $ s
 
 
 
@@ -71,10 +71,10 @@ toRuleset = proc rs -> do typ <- getAttrValue "type" -< rs
                           bases <- listA $ this /> hasName "rbnfrule" >>> toRule -< rs
                           returnA -< (typ, M.fromList bases)
 
-toRule :: IOSArrow XmlTree (Integer, [Part])
+toRule :: IOSArrow XmlTree (Integer, Spellout)
 toRule = proc r -> do v <- getAttrValue "value" >>> readBase -< r
                       t <- this /> getText -< r
-                      returnA -< (v, parseRule t)
+                      returnA -< (v, parseSpellout t)
 
 readBase :: (ArrowXml cat, ArrowChoice cat) => cat String Integer
 readBase = proc x ->

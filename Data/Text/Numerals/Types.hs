@@ -13,10 +13,15 @@ data Part = S String            -- | literal string
           | Stop                -- | too big, leave it in numeric form
             deriving (Eq,Ord,Show)
 
+
+type Spellout = [Part]
+
 data RuleRef = Default | Alt String deriving (Eq,Ord,Show)
 
 data Gender = Masculine | Feminine | Neuter deriving Show
 
-type BasesMap = Map Integer [Part]
+type BasesMap = Map Integer Spellout
 
-data Rule = Rule String (Map String BasesMap) deriving Show
+type RuleSetName = String
+
+data Rule = Rule String (Map RuleSetName BasesMap) deriving Show
