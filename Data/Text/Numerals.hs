@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 -- |
 -- Module      : Text.Numerals
 -- Copyright   : (c) 2015 Antonio Nikishaev
@@ -11,6 +12,8 @@
 module Data.Text.Numerals where
 
 import qualified Data.Map as M
+import Data.Text (Text,unpack)
+import qualified Data.Text as T
 import Data.Text.Numerals.Types
 import qualified Data.Text.Numerals.Defs.En as En
 import qualified Data.Text.Numerals.Defs.Fi as Fi
@@ -24,13 +27,13 @@ spell (Rule la ru) = process r . Just
     where r = ru M.! "spellout-cardinal"
 
 
-process :: BasesMap -> Maybe Integer -> String
+process :: BasesMap -> Maybe Integer -> Text
 process rls Nothing = ""
 process rls (Just x)
     | Just (base,prc) <- M.lookupLE x rls = process1 base x prc
     | otherwise = ""
     where
-          process1 base x prc = concatMap f prc
+          process1 ruleBase x prc = T.concat . map f $ prc
               where
                 -- Rule = { n*base   =>  "spelling" }
                 -- We have x: x = n*base + diff
@@ -43,6 +46,7 @@ process rls (Just x)
                                   | otherwise = ""
                 f (Fun Prefix Default) = process rls (Just k)
                 f (Fun Postfix Default) = process rls (Just diff)
-                f Stop = show x
+                f Stop = T.pack (show x)
+
 
 

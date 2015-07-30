@@ -1,12 +1,13 @@
 module Data.Text.Numerals.Types where
 import Data.Map (Map)
+import Data.Text (Text)
 
 data Fun = Prefix               -- | base digit
          | Postfix              -- | minor digits
            deriving (Eq,Ord,Show)
 
 -- see parse.hs
-data Part = S String            -- | literal string
+data Part = S Text              -- | literal string
           | Possible [Part]     -- | […]
           | Fun Fun RuleRef           -- | ←…← / →…→ / …
           | Replace RuleRef          -- | =…=
@@ -16,12 +17,12 @@ data Part = S String            -- | literal string
 
 type Spellout = [Part]
 
-data RuleRef = Default | Alt String deriving (Eq,Ord,Show)
+data RuleRef = Default | Alt Text deriving (Eq,Ord,Show)
 
 data Gender = Masculine | Feminine | Neuter deriving Show
 
 type BasesMap = Map Integer Spellout
 
-type RuleSetName = String
+type RuleSetName = Text
 
-data Rule = Rule String (Map RuleSetName BasesMap) deriving Show
+data Rule = Rule Text (Map RuleSetName BasesMap) deriving Show
