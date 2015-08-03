@@ -1,5 +1,6 @@
 
-module Data.Text.Defs.Fi where
+{-# LANGUAGE OverloadedStrings #-}
+module Data.Text.Numerals.Defs.Fi where
 import Data.Map
 import Data.Text.Numerals.Types
 rule :: Rule
