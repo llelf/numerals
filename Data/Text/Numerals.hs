@@ -9,11 +9,14 @@
 --
 
 
-module Data.Text.Numerals where
+module Data.Text.Numerals
+    (spell,spellEn,spellFi,spellIt,
+     module Numeric.Natural) where
 
 import qualified Data.Map as M
 import Data.Text (Text,unpack)
 import qualified Data.Text as T
+import Numeric.Natural
 import Data.Text.Numerals.Types
 import qualified Data.Text.Numerals.Defs.En as En
 import qualified Data.Text.Numerals.Defs.Fi as Fi
@@ -23,12 +26,12 @@ import qualified Data.Text.Numerals.Defs.Fi as Fi
 spellEn = spell En.rule
 spellFi = spell Fi.rule
 
-spell (Rule la ru) = process r . Just
-    where r = ru M.! "spellout-cardinal"
+spell (Rule la ru) sex = process r . Just . fromIntegral
+    where r = ru M.! (spelloutsByGender M.! sex)
 
 
-spelloutsByGender :: [(Maybe Gender, RuleSetName)]
-spelloutsByGender = [
+spelloutsByGender :: M.Map (Maybe Gender) RuleSetName
+spelloutsByGender = M.fromList [
  (Just Masculine, "spellout-cardinal-masculine"),
  (Just Feminine,  "spellout-cardinal-feminine"),
  (Just Neuter,    "spellout-cardinal-neuter"),

@@ -5,7 +5,7 @@ import qualified Data.Text as T
 import Data.Function
 import Data.Text.Numerals
 
-testsFi :: [(Integer,T.Text)]
+testsFi :: [(Natural,T.Text)]
 testsFi = [
  (0, "nolla"),
  (7, "seitsemän"),

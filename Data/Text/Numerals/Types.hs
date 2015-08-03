@@ -19,7 +19,7 @@ type Spellout = [Part]
 
 data RuleRef = Default | Alt Text deriving (Eq,Ord,Show)
 
-data Gender = Masculine | Feminine | Neuter deriving Show
+data Gender = Masculine | Feminine | Neuter deriving (Eq,Ord,Show)
 
 type BasesMap = Map Integer Spellout
 
