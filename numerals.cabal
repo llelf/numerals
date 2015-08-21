@@ -20,6 +20,8 @@ library
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base >=4.7 && <5
+                     , directory >= 1.2
+                     , nats >= 1
                      , containers
                      , hxt
                      , hxt-xpath
