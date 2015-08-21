@@ -1,3 +1,5 @@
+
+
 {-# LANGUAGE OverloadedStrings #-}
 -- |
 -- Module      : Text.Numerals
@@ -10,7 +12,8 @@
 
 
 module Data.Text.Numerals
-    (spell,spellEn,spellFi,spellIt,
+    (spell,spellEn,spellFi,spellIt,spellFr,
+     Gender(..),
      module Numeric.Natural) where
 
 import qualified Data.Map as M
@@ -20,13 +23,18 @@ import Numeric.Natural
 import Data.Text.Numerals.Types
 import qualified Data.Text.Numerals.Defs.En as En
 import qualified Data.Text.Numerals.Defs.Fi as Fi
+import qualified Data.Text.Numerals.Defs.It as It
+import qualified Data.Text.Numerals.Defs.Fr as Fr
 
 
 
-spellEn = spell En.rule
-spellFi = spell Fi.rule
+spellEn = spell En.rule Nothing
+spellFi = spell Fi.rule Nothing
+spellIt = spell It.rule
+spellFr = spell Fr.rule
 
-spell (Rule la ru) sex = process r . Just . fromIntegral
+spell :: Rule -> Maybe Gender -> Natural -> Text
+spell (Rule _ ru) sex = process ru r . Just . fromIntegral
     where r = ru M.! (spelloutsByGender M.! sex)
 
 
@@ -40,9 +48,9 @@ spelloutsByGender = M.fromList [
 
 
 
-process :: BasesMap -> Maybe Integer -> Text
-process rls Nothing = ""
-process rls (Just x)
+process :: M.Map RuleSetName BasesMap -> BasesMap -> Maybe Integer -> Text
+process _ _ Nothing = ""
+process allRules rls (Just x)
     | Just (base,prc) <- M.lookupLE x rls = process1 base x prc
     | otherwise = ""
     where
@@ -57,8 +65,11 @@ process rls (Just x)
                 f (S s) = s
                 f (Possible smth) | diff>0 = T.concat . map f $ smth
                                   | otherwise = ""
-                f (Fun Prefix Default) = process rls (Just k)
-                f (Fun Postfix Default) = process rls (Just diff)
+                f (Fun Prefix Default)    = process allRules rls (Just k)
+                f (Fun Prefix (Alt alt))  = process allRules (allRules M.! alt) (Just k)
+                f (Fun Postfix Default)   = process allRules rls (Just diff)
+                f (Fun Postfix (Alt alt)) = process allRules (allRules M.! alt) (Just diff)
+                f (Replace (Alt alt))     = process allRules (allRules M.! alt) (Just x)
                 f Stop = T.pack (show x)
 
 
