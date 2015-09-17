@@ -35,7 +35,7 @@ parser = [Stop] <$ try (string "=#" <|> string "ERROR-")
                          <|> Fun Postfix <$> between (char '→') (char '→') ruleRef
                          <|> S . T.pack <$> many1 (letter<|>space<|>punct))
 
-punct = oneOf "-\xad"
+punct = oneOf "-’,\xad\x200b"
 
 ruleRef :: Parser RuleRef
 ruleRef = Alt <$> altRuleName <|> Default <$ string ""
