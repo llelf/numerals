@@ -25,7 +25,7 @@ import Data.Text.Numerals.Types
 -- “un miliardo[ →→];”   ⟶ [S "un miliardo", Possible [S " ", Fun Postfix Default]]
 -- “vent→%%msc-with-i→;” ⟶ [S "vent", Fun Postfix (Alt "msc-with-i")]
 parser :: Parser Spellout
-parser = [Stop] <$ try (string "=#")
+parser = [Stop] <$ try (string "=#" <|> string "ERROR-")
          <|> normal
     where normal = many (between (string "[") (string "]") (Possible <$> normal)
                          <|> Replace <$>     between (char '=') (char '=') ruleRef
