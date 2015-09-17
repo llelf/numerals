@@ -3,6 +3,7 @@ module Test where
 
 import qualified Data.Text as T
 import Data.Function
+import Data.Monoid
 import Data.Text.Numerals
 
 testsFi :: [(Natural,T.Text)]
@@ -25,8 +26,23 @@ testsFi = [
  (1026234, "yksi miljoona kaksikymmentäkuusituhattakaksisataakolmekymmentäneljä")
  ]
 
+testsIt :: [(Gender,Natural,T.Text)]
+testsIt = [
+ (Masculine, 1, "un"), (Feminine, 1, "una"),
+ (Masculine, 33, "trentatré"),
+ (Masculine, 77, "settantasette"),
+ (Masculine, 100, "cento"), (Feminine, 100, "cento"),
+ (Masculine, 200, "duecento"),
+ (Masculine, 342, "trecentoquarantadue"),
+ (Masculine, 1984, "millenovecentottantaquattro"),
+ (Masculine, 2000, "duemila")
+ ]
 
 norm = T.concat . T.split (`elem` " -\xad")
 
-test = all f testsFi
-    where f (n,s) = ((==)`on`norm) (spellFi n) s || error (show n)
+test = and [all (f1 spellFi) testsFi,
+            all (f2 spellIt) testsIt
+           ]
+    where f1 sp (n,s) = ((==)`on`norm) (sp n) s || error (show n)
+          f2 sp (g,n,s) = ((==)`on`norm) (sp (Just g) n) s || error (show n)
+
