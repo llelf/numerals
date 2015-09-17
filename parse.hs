@@ -29,7 +29,9 @@ parser = [Stop] <$ try (string "=#" <|> string "ERROR-")
          <|> normal
     where normal = many (between (string "[") (string "]") (Possible <$> normal)
                          <|> Replace <$>     between (char '=') (char '=') ruleRef
+--                         <|> try (Stop <$    between (char '←') (string "←←") ruleRef)
                          <|> Fun Prefix <$>  between (char '←') (char '←') ruleRef
+                         <|> try (Stop <$    between (char '→') (string "→→") ruleRef)
                          <|> Fun Postfix <$> between (char '→') (char '→') ruleRef
                          <|> S . T.pack <$> many1 (letter<|>space<|>punct))
 
