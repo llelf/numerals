@@ -4,7 +4,7 @@ module Main where
 import qualified Data.Map as M
 import Text.Parsec
 import Text.Parsec.Text
-import Control.Applicative ((<$),(<$>),(*>))
+import Control.Applicative ((<$),(<$>),(*>),(<*))
 import Text.XML.HXT.Core
 import Text.XML.HXT.XPath
 import Text.Read
@@ -25,17 +25,24 @@ import Data.Text.Numerals.Types
 -- “un miliardo[ →→];”   ⟶ [S "un miliardo", Possible [S " ", Fun Postfix Default]]
 -- “vent→%%msc-with-i→;” ⟶ [S "vent", Fun Postfix (Alt "msc-with-i")]
 parser :: Parser Spellout
-parser = [Stop] <$ try (string "=#" <|> string "ERROR-")
-         <|> normal
+parser = parser' <* char ';'
+
+parser' :: Parser Spellout
+parser' = [Stop] <$ try (string "=#" <|> string "ERROR-")
+                    <* anyChar `manyTill` lookAhead (char ';')
+          <|> normal
     where normal = many (between (string "[") (string "]") (Possible <$> normal)
                          <|> Replace <$>     between (char '=') (char '=') ruleRef
 --                         <|> try (Stop <$    between (char '←') (string "←←") ruleRef)
                          <|> Fun Prefix <$>  between (char '←') (char '←') ruleRef
                          <|> try (Stop <$    between (char '→') (string "→→") ruleRef)
                          <|> Fun Postfix <$> between (char '→') (char '→') ruleRef
-                         <|> S . T.pack <$> many1 (letter<|>space<|>punct))
+                         <|> S . T.pack <$> many1 (letter<|>space<|>punct<|>digits))
 
-punct = oneOf "-’,\xad\x200b"
+punct = oneOf ":-'’,\xad\x200b\x200c\x303"
+        <|> satisfy ((`elem` [SpacingCombiningMark,NonSpacingMark]) . generalCategory)
+
+digits = satisfy isNumber
 
 ruleRef :: Parser RuleRef
 ruleRef = Alt <$> altRuleName <|> Default <$ string ""
