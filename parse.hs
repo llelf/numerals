@@ -65,10 +65,11 @@ purr = proc z ->
           lang <- this /> getXPathTrees "identity/language" >>> getAttrValue "type" -< ld
           ruleset <- listA (this /> getXPathTrees "rbnf/rulesetGrouping/ruleset"
                                 -- TODO parse rules there
-                            >>> hasAttrValue "type" (not . ("ordinal" `isSuffixOf`))
+                            >>> hasAttrValue "type" (not . ignore)
                             >>> toRuleset) -< ld
           returnA -< Rule (T.pack lang) (M.fromList ruleset)
-
+    where ignore x = "ordinal" `isSuffixOf` x
+                     || "lenient-parse" == x
 
 
 toRuleset :: IOSArrow XmlTree (T.Text,BasesMap)
