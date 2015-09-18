@@ -110,9 +110,16 @@ parseLang lang = do
   [rules] <- runX $ readDocumentOf lang >>> purr
   return rules
 
-langs = ["en","fi","hi","hy","id","it","ms","se"]
+
+ignore = ["be","pl","ru",           -- … $(…)
+          "ky"                      -- … #,##
+         ]
 
 main = do
-  forM_ langs $ \lang -> parseLang lang >>= writeLang lang
+  defs <- filter (`notElem`[".","..","root.xml"]++map (++".xml")ignore) -- TODO
+          <$> getDirectoryContents "definitions/num"
+  print defs
+  let langs = map (reverse . drop 4 . reverse) defs
+  forM_ langs $ \lang -> putStrLn lang >> parseLang lang >>= writeLang lang
 
 
