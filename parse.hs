@@ -93,16 +93,17 @@ readBase = proc x ->
 
 readDocumentOf lang = readDocument [] [i|definitions/num/#{lang}.xml|]
 
-
-writeLang lang rules = writeFile [i|Data/Text/Numerals/Defs/#{mlang}.hs|]
-            [i|
+writeRules :: M.Map T.Text Rule -> IO ()
+writeRules rules = writeFile [i|Data/Text/Numerals/Defs.hs|]
+                   [i|
 {-# LANGUAGE OverloadedStrings #-}
-module Data.Text.Numerals.Defs.#{mlang} where
-import Data.Map
+module Data.Text.Numerals.Defs where
+import Data.Map (Map,fromList)
+import Data.Text (Text)
 import Data.Text.Numerals.Types
-rule :: Rule
-rule = #{rules}
-|] where mlang = toUpper (head lang) : tail lang
+rules :: Map Text Rule
+rules = #{rules}
+|]
 
 
 parseLang :: String -> IO Rule
@@ -120,6 +121,8 @@ main = do
           <$> getDirectoryContents "definitions/num"
   print defs
   let langs = map (reverse . drop 4 . reverse) defs
-  forM_ langs $ \lang -> putStrLn lang >> parseLang lang >>= writeLang lang
+  rules <- M.fromList . zip (map T.pack langs) <$> mapM parseLang langs
+  writeRules rules
+
 
 
