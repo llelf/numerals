@@ -17,21 +17,23 @@ module Data.Text.Numerals
      module Numeric.Natural) where
 
 import qualified Data.Map as M
+import Data.Map (Map,(!))
 import Data.Text (Text,unpack)
 import qualified Data.Text as T
 import Numeric.Natural
 import Data.Text.Numerals.Types
-import qualified Data.Text.Numerals.Defs.En as En
-import qualified Data.Text.Numerals.Defs.Fi as Fi
-import qualified Data.Text.Numerals.Defs.It as It
-import qualified Data.Text.Numerals.Defs.Fr as Fr
+import qualified Data.Text.Numerals.Defs as Defs
+
+rulesEn = Defs.rules!"en"
+rulesFi = Defs.rules!"fi"
+rulesIt = Defs.rules!"it"
+rulesFr = Defs.rules!"fr"
 
 
-
-spellEn = spell En.rule Nothing
-spellFi = spell Fi.rule Nothing
-spellIt = spell It.rule
-spellFr = spell Fr.rule
+spellEn = spell rulesEn Nothing
+spellFi = spell rulesFi Nothing
+spellIt = spell rulesIt
+spellFr = spell rulesFr
 
 spell :: Rule -> Maybe Gender -> Natural -> Text
 spell (Rule _ ru) sex = process ru r . Just . fromIntegral
